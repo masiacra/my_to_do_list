@@ -9,4 +9,10 @@ function readfile(path, res, header) {
 	});
 }
 
+readfile.headers = {
+	'js': {"Content-Type": 'text/javascript'},
+	'html': {"Content-Type": 'text/html'},
+	'css': {"Content-Type": 'text/css'}
+};
+
 module.exports = {readfile};

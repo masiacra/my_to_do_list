@@ -12,20 +12,22 @@ http.createServer((req, res) => {
 	
 	console.log(req.url);
 	if (req.url === '/') {
-		my_read.readfile('./pages/index.html', res, {"Content-Type": "text/html"});
+		my_read.readfile('./pages/index.html', res, 
+			my_read.readfile.headers["html"]);
 	} else if (req.url === '/scripts/ajax.js') {
-		my_read.readfile('./scripts/ajax.js', res, {"Content-Type": "application/javascript"});
+		my_read.readfile('./scripts/ajax.js', res, 
+			my_read.readfile.headers["js"]);
 	} else if (req.url === '/new_test') {
 		db.getInfoFromDB(res);
 	} else if (req.url === '/scripts/list.js') {
 		my_read.readfile('./scripts/list.js', res, 
-			{"Content-Type": "application/javascript"});
+			my_read.readfile.headers["js"]);
 	} else if (req.url === '/scripts/main.js') {
 		my_read.readfile('./scripts/main.js', res, 
-			{"Content-Type": "application/javascript"});
+			my_read.readfile.headers["js"]);
 	} else if (req.url === '/scripts/form.js') {
 		my_read.readfile('./scripts/form.js', res, 
-			{"Content-Type": "application/javascript"});
+			my_read.readfile.headers["js"]);
 		
 	} else if (req.url === '/submit') {
 		let postData = '';
@@ -34,13 +36,11 @@ http.createServer((req, res) => {
 		});
 		req.addListener('end', () => {
 			postData = parser.parse(postData);
-			//console.log(postData);
-			
 			db.addIntoDB(postData);
 		});
 	} else if (req.url === '/scripts/create_element.js') {
 		my_read.readfile('./scripts/create_element.js', res, 
-			{"Content-Type": "application/javascript"});
+			my_read.readfile.headers["js"]);
 	} else if (req.url === '/delete') {
 		let delData = '';
 		req.addListener('data', data => {
