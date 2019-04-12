@@ -13,7 +13,10 @@ class List {
 					let li = createElement({name: 'li', inner: obj.act});
 					li.dataset.id = obj.id;
 					li.appendChild( createElement({name: 'button', 
-						inner: 'delete'}) );
+						inner: 'delete', classname: 'delete'}) );
+					li.appendChild( createElement({name: 'button',
+						inner: 'edit', classname: 'edit'}) );	
+						
 					ol.appendChild(li);
 				}
 				this.elem.innerHTML = '';
@@ -28,14 +31,26 @@ class List {
 	
 	
 	_onClick(event) {
+		
+		function deleteElem(target) {
+			let parent = target.parentNode;
+			let id = parent.getAttribute('data-id');
+			deleteData(id);
+			parent.parentNode.removeChild(parent);
+		}
+		
+		function editElem(target) {
+		}
+		
 		let target = event.target;
 		if (target.tagName != 'BUTTON') return;
-		
+		if (target.className === 'delete') {
+			deleteElem(target);
+		} else {
+			editElem(target);
+		}
 
-		let parent = target.parentNode;
-		let id = parent.getAttribute('data-id');
-		deleteData(id);
-		parent.parentNode.removeChild(parent);
+
 	}
 
 }

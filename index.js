@@ -17,7 +17,6 @@ http.createServer((req, res) => {
 		my_read.readfile('./scripts/ajax.js', res, {"Content-Type": "application/javascript"});
 	} else if (req.url === '/new_test') {
 		db.getInfoFromDB(res);
-		//my_read.readfile('./configuration.json', res, {"Content-Type": "text/plain"});
 	} else if (req.url === '/scripts/list.js') {
 		my_read.readfile('./scripts/list.js', res, 
 			{"Content-Type": "application/javascript"});
