@@ -5,7 +5,18 @@ class List {
 	}
 	
 	render(data) {
-		console.log(data);
+		//Вспомогательная функция для создания элементов "на лету"
+		function createElement({name, inner, classname}) {
+			let elem = document.createElement(name);
+			if (inner) {
+				elem.innerHTML = inner;
+			}
+			if (classname) {
+				elem.className = classname;
+			}
+			return elem;
+		}
+
 		if (data) {
 			if (data.length != 0) {
 				let ol = createElement({name: 'ol'});
@@ -14,8 +25,6 @@ class List {
 					li.dataset.id = obj.id;
 					li.appendChild( createElement({name: 'button', 
 						inner: 'delete', classname: 'delete'}) );
-					li.appendChild( createElement({name: 'button',
-						inner: 'edit', classname: 'edit'}) );	
 						
 					ol.appendChild(li);
 				}
@@ -39,18 +48,10 @@ class List {
 			parent.parentNode.removeChild(parent);
 		}
 		
-		function editElem(target) {
-		}
 		
 		let target = event.target;
 		if (target.tagName != 'BUTTON') return;
-		if (target.className === 'delete') {
-			deleteElem(target);
-		} else {
-			editElem(target);
-		}
-
-
+		deleteElem(target);
 	}
 
 }

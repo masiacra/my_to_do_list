@@ -4,10 +4,8 @@ const db = require('./db');
 
 const http = require('http');
 
-const parser = require('./parser');
-
 console.log('server is running');
-//console.log(my_read.readfile);
+
 http.createServer((req, res) => {
 	
 	console.log(req.url);
@@ -35,7 +33,7 @@ http.createServer((req, res) => {
 			postData += postDataChunk;
 		});
 		req.addListener('end', () => {
-			postData = parser.parse(postData);
+			postData = parse(postData);
 			db.addIntoDB(postData);
 		});
 	} else if (req.url === '/scripts/create_element.js') {
@@ -54,6 +52,11 @@ http.createServer((req, res) => {
 				db.deleteFromDB(id);
 			}
 		});
+	} else if (req.url === '/favicon.ico') {
+		my_read.readfile('./favicon.ico', res);
+	} else if (req.url === '/styles/custom.css') {
+		my_read.readfile('./styles/custom.css', res, 
+			my_read.readfile.headers['css']);
 	} else {
 		res.statusCode = 400;
 		res.write("Not found");
@@ -61,3 +64,12 @@ http.createServer((req, res) => {
 	}
 	
 }).listen(3000);
+
+//вспомогательная функция для парсинга данных post-запроса
+function parse(str) {
+	str = str.replace('act=', '');
+	str = str.replace(/%20/g, ' ');
+	return str;
+}
+
+

@@ -1,3 +1,5 @@
+
+
 function getData(cb) {
 
 	let xhr = new XMLHttpRequest();
@@ -33,4 +35,4 @@ function deleteData(id) {
 }
 
 
-//getData(console.log);
+
