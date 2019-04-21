@@ -35,6 +35,8 @@ http.createServer((req, res) => {
 		req.addListener('end', () => {
 			postData = parse(postData);
 			db.addIntoDB(postData);
+			res.statusCode = 200;
+			res.end();
 		});
 	} else if (req.url === '/scripts/create_element.js') {
 		my_read.readfile('./scripts/create_element.js', res, 
@@ -51,6 +53,8 @@ http.createServer((req, res) => {
 				id = id[0];
 				db.deleteFromDB(id);
 			}
+			res.statusCode = 200;
+			res.end();
 		});
 	} else if (req.url === '/favicon.ico') {
 		my_read.readfile('./favicon.ico', res);

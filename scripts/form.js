@@ -1,14 +1,14 @@
 class Form {
-	constructor(form) {
+	constructor(form, cb) {
 		this.form = form;
 		this.form.onclick = this._onClick.bind(this);
 		this.form.onsubmit = () => {return false;};
 		this.indicator = false;
+		this.cb = cb;
 	}
 	
 	send() {
 		let value = this.form.act.value;
-		//console.log('warning');
 		if (!this.isValid(value)) {
 			if (!this.indicator) {
 				this.indicator = true;
@@ -27,9 +27,18 @@ class Form {
 		}
 		let data = 'act=' + encodeURIComponent(value);
 		this.form.act.value = '';
-		sendData(data);
-		let evt = new Event('send data', {bubbles: true});
-		this.form.dispatchEvent(evt);
+		let self = this;
+		fetch('/submit', {method: 'POST', 
+			headers:  {"Content-Type": "text/plain"},
+			body: data})
+			.then( function(response) {
+				console.log(response.status);
+				//console.log(this.cb);
+				self.cb();
+
+			}, err => {
+				console.error(err);
+			});
 	}
 	
 	isValid(data) {

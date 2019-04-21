@@ -4,7 +4,7 @@ class List {
 		this.elem.onclick = this._onClick.bind(this);
 	}
 	
-	render(data) {
+	render() {
 		//Вспомогательная функция для создания элементов "на лету"
 		function createElement({name, inner, classname}) {
 			let elem = document.createElement(name);
@@ -16,9 +16,16 @@ class List {
 			}
 			return elem;
 		}
-
-		if (data) {
+	console.log('getting data');
+	let promise = fetch('/new_test', {method: 'GET'})
+		.then( response => {
+			return response.json();
+		}, err => {
+			console.error(err);
+		})
+		.then( data => {
 			if (data.length != 0) {
+				console.log(data);
 				let ol = createElement({name: 'ol'});
 				for (let obj of data) {
 					let li = createElement({name: 'li', inner: obj.act});
@@ -33,9 +40,10 @@ class List {
 			} else {
 				this.elem.innerHTML = 'You have not added a single case';
 			}
-		} else {
+		}, err => {
+			console.error(err);
 			this.elem.innerHTML = "Sorry, we have some problems";
-		}
+		});
 	}
 	
 	
@@ -44,7 +52,16 @@ class List {
 		function deleteElem(target) {
 			let parent = target.parentNode;
 			let id = parent.getAttribute('data-id');
-			deleteData(id);
+			fetch('/delete', {
+				method: 'DELETE',
+				headers: {'Content-Type': 'application/json'},
+				body: 'id=' + id
+			})
+			.then( res => {
+
+			}, err => {
+				console.error(err);
+			});
 			parent.parentNode.removeChild(parent);
 		}
 		

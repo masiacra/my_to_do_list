@@ -1,9 +1,15 @@
 const list = new List(document.body.getElementsByClassName('list')[0]);
 
-getData(list.render.bind(list));
+list.render();
 
-const form = new Form(document.forms[0]);
+const form = new Form(document.forms[0], list.render.bind(list));
 
+
+
+/*
 document.body.addEventListener('send data', () => {
-	getData(list.render.bind(list));
+	console.log('sending data');
+	list.render();
 });
+
+*/

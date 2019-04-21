@@ -1,0 +1,16 @@
+"""configuration commands for DB mysql""" 
+
+CREATE to_do_list_DB;
+
+USE to_do_list_DB;
+
+
+CREATE TABLE to_do_list (
+id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+act VARCHAR(250)
+);
+
+
+CREATE USER 'admin_cock'@'localhost' IDENTIFIED BY 'parol';
+
+GRANT SELECT, DELETE, INSERT ON to_do_list_DB.to_do_list TO 'admin_cock'@'localhost';
