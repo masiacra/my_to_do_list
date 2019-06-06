@@ -1,79 +1,96 @@
-const my_read = require('./my_read');
+/*
+ * 
+ * Инициализирующий скрипт
+ * 
+ */ 
 
-const db = require('./db');
-
+//Зависимости
+const db = require('./lib/db');
 const http = require('http');
+const PORT = process.env.PORT || 5000;
+const url = require('url');
+const getHandler = require('./lib/getHandler');
+const postHandler = require('./lib/postHandler');
+const deleteHandler = require('./lib/deleteHandler');
+const StringDecoder = require('string_decoder').StringDecoder;
 
-console.log('server is running');
+const server = http.createServer(serve);
 
-http.createServer((req, res) => {
+
+server.listen(PORT, () => {
+	console.log(`Сервер слушает порт ${PORT}`);
+});
+
+
+
+
+
+
+const router = {
+	'get': getHandler.handle,
+	'post': postHandler.handle,
+	'delete': deleteHandler.handle
+};
+
+
+function serve(req, res) {
 	
-	console.log(req.url);
-	if (req.url === '/') {
-		my_read.readfile('./pages/index.html', res, 
-			my_read.readfile.headers["html"]);
-	} else if (req.url === '/scripts/ajax.js') {
-		my_read.readfile('./scripts/ajax.js', res, 
-			my_read.readfile.headers["js"]);
-	} else if (req.url === '/new_test') {
-		db.getInfoFromDB(res);
-	} else if (req.url === '/scripts/list.js') {
-		my_read.readfile('./scripts/list.js', res, 
-			my_read.readfile.headers["js"]);
-	} else if (req.url === '/scripts/main.js') {
-		my_read.readfile('./scripts/main.js', res, 
-			my_read.readfile.headers["js"]);
-	} else if (req.url === '/scripts/form.js') {
-		my_read.readfile('./scripts/form.js', res, 
-			my_read.readfile.headers["js"]);
-		
-	} else if (req.url === '/submit') {
-		let postData = '';
-		req.addListener('data', (postDataChunk) => {
-			postData += postDataChunk;
-		});
-		req.addListener('end', () => {
-			postData = parse(postData);
-			db.addIntoDB(postData);
-			res.statusCode = 200;
-			res.end();
-		});
-	} else if (req.url === '/scripts/create_element.js') {
-		my_read.readfile('./scripts/create_element.js', res, 
-			my_read.readfile.headers["js"]);
-	} else if (req.url === '/delete') {
-		let delData = '';
-		req.addListener('data', data => {
-			console.log(data.toString());
-			delData += data;
-		});
-		req.addListener('end', () => {
-			let id = delData.match(/\d+/);
-			if (id) {
-				id = id[0];
-				db.deleteFromDB(id);
-			}
-			res.statusCode = 200;
-			res.end();
-		});
-	} else if (req.url === '/favicon.ico') {
-		my_read.readfile('./favicon.ico', res);
-	} else if (req.url === '/styles/custom.css') {
-		my_read.readfile('./styles/custom.css', res, 
-			my_read.readfile.headers['css']);
-	} else {
+	//Получаем url и парсим
+	const parsedUrl = url.parse(req.url, true);
+	//Получаем путь и удаляемс слэши
+	let npath = parsedUrl.pathname;
+	if (~npath.indexOf('\0')) {
 		res.statusCode = 400;
-		res.write("Not found");
-		res.end();
+        res.end("Bad Request");
+        return;
 	}
+	npath = npath.replace(/^\/+|\/+$/g, '');
+	//Получаем метод запроса
+	const method = req.method.toLowerCase();
 	
-}).listen(3000);
-
-//вспомогательная функция для парсинга данных post-запроса
-function parse(str) {
-	str = str.replace('act=', '');
-	str = str.replace(/%20/g, ' ');
-	return str;
+	//Получаем query string
+	const queryString = parsedUrl.query;
+	
+	//Инициализируем декодер буфера
+	const decoder = new StringDecoder('utf8');
+	
+	
+	let buffer = '';
+	
+	req.on('data', (chunk) => {
+		buffer += decoder.write(chunk);
+		//Если данных много ~~~1 мб, то обрываем соединение
+		if (buffer.length > 1e6) { 
+			req.connection.destroy();
+		}
+	});
+	req.on('end', () => {
+		buffer += decoder.end();
+		
+		
+		
+		const chosenHandler = router[method];
+		
+		const data = {
+			npath,
+			res,
+			queryString,
+			body: parseJsonToObject(buffer)
+		};
+		
+		chosenHandler(data);
+		
+	});
+		
 }
 
 
+//Преобразование строки в объект
+function parseJsonToObject(str) {
+	try {
+		const obj = JSON.parse(str);
+		return obj;
+	} catch(e) {
+		return {};
+	}
+}
