@@ -53,6 +53,12 @@ const list = new class {
 		this.elem.innerHTML = 'Sorry, some server problems';
 	}
 	
+	clearElement(id) {
+		const itemToRemove = this.elem.querySelector(`li[data-id='${id}']`);
+		const parent = itemToRemove.parentNode;
+		parent.removeChild(itemToRemove);  
+	}
+	
 	_onClick(event) {
 		const target = event.target;
 		if (target.tagName !== 'BUTTON') return;
@@ -80,27 +86,52 @@ const ee = new class {
 
 
 const xhr = new class {
+	constructor(url) {
+		this.url = url;
+	}
 	get(cb) {
 		const xml = new XMLHttpRequest();
-		xml.open('GET', '/list', true);
+		xml.open('GET', this.url, true);
 		xml.send();
 		xml.onload = function() {
-			//console.log(this.responseText);
 			cb(null, JSON.parse(this.responseText));
 		};
 		xhr.onerror = function() {
 			cb('Ошибка ' + this.status);
 		};
 	}
-}();
+	
+	delete(body) {
+		const xml = new XMLHttpRequest();
+		xml.open('DELETE', this.url, true);	
+		body = JSON.stringify(body);	
+		xml.send(body);
+		xml.onload = function() {
+			cb(null);
+		};
+		xml.onerror = function() {
+			cb(new Error('Ошибка удаления'));
+		};
+	}
+	
+}('/list');
 
 
 
 
-ee.on('DOMContentLoaded', () => {
-	xhr.get(list.render.bind(list));
-});
+//ee.on('DOMContentLoaded', () => {
+	//xhr.get(list.render.bind(list));
+//});
 
 ee.on('delete', function(event) {
-	console.log(event.detail);
+	const body = {
+		id: event.detail
+	};
+	xhr.delete(body, (err) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		list.clearElement(id);
+	});
 });
