@@ -4,7 +4,7 @@ const list = new class {
 		this.elem.onclick = this._onClick.bind(this);
 	}
 	
-	render(data) {
+	render(err, data) {
 		//Вспомогательная функция для создания элементов "на лету"
 		function createElement({name, inner, classname}) {
 			let elem = document.createElement(name);
@@ -17,9 +17,16 @@ const list = new class {
 			return elem;
 		}
 		
+		if (err) {
+			console.log(err);
+			this.reportAnError();
+			return;
+		}
+		
+		
 		
 		data = typeof(data) === 'object' && data instanceof Array ?
-			data :null;
+			data : null;
 		if (data) {
 			if (data.length === 0) {
 				this.elem.innerHTML = 'You have not added a single case';
@@ -37,6 +44,7 @@ const list = new class {
 				this.elem.appendChild(ol);
 			}
 		} else {
+			console.error('Incorrect data format');
 			this.reportAnError();
 		}
 	}
@@ -68,9 +76,30 @@ const ee = new class {
 		this.eventEmitter.addEventListener(name, fn);
 	}
 	
-}(document.body);
+}(document);
 
 
+const xhr = new class {
+	get(cb) {
+		const xml = new XMLHttpRequest();
+		xml.open('GET', '/list', true);
+		xml.send();
+		xml.onload = function() {
+			//console.log(this.responseText);
+			cb(null, JSON.parse(this.responseText));
+		};
+		xhr.onerror = function() {
+			cb('Ошибка ' + this.status);
+		};
+	}
+}();
+
+
+
+
+ee.on('DOMContentLoaded', () => {
+	xhr.get(list.render.bind(list));
+});
 
 ee.on('delete', function(event) {
 	console.log(event.detail);
