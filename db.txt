@@ -1,6 +1,6 @@
 """configuration commands for DB mysql""" 
 
-CREATE to_do_list_DB;
+CREATE DATABASE to_do_list_DB;
 
 USE to_do_list_DB;
 
@@ -11,6 +11,9 @@ act VARCHAR(250)
 );
 
 
-CREATE USER 'admin_cock'@'localhost' IDENTIFIED BY 'parol';
+CREATE USER 'admin_cock2'@'localhost' IDENTIFIED BY 'parol';
 
-GRANT SELECT, DELETE, INSERT ON to_do_list_DB.to_do_list TO 'admin_cock'@'localhost';
+GRANT SELECT, DELETE, INSERT ON to_do_list_DB.to_do_list TO 'admin_cock2'@'localhost';
+
+
+INSERT INTO to_do_list (act) VALUES ('do excercises');

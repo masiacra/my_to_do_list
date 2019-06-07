@@ -8,6 +8,7 @@
 const db = require('./lib/db');
 const http = require('http');
 const PORT = process.env.PORT || 5000;
+const HOST = '127.0.0.1';
 const url = require('url');
 const getHandler = require('./lib/getHandler');
 const postHandler = require('./lib/postHandler');
@@ -17,8 +18,8 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const server = http.createServer(serve);
 
 
-server.listen(PORT, () => {
-	console.log(`Сервер слушает порт ${PORT}`);
+server.listen(PORT, HOST, () => {
+	console.log(`Server running at ${HOST}:${PORT}`);
 });
 
 
