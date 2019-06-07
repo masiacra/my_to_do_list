@@ -1,6 +1,7 @@
 const list = new class {
 	constructor(elem) {
 		this.elem = elem;
+		this.elem.onclick = this._onClick.bind(this);
 	}
 	
 	render(data) {
@@ -44,10 +45,33 @@ const list = new class {
 		this.elem.innerHTML = 'Sorry, some server problems';
 	}
 	
-	
-
-	
-	
+	_onClick(event) {
+		const target = event.target;
+		if (target.tagName !== 'BUTTON') return;
+		let evt = new CustomEvent('delete', {
+			bubbles: true, 
+			detail: target.parentNode.dataset.id
+		});
+		this.elem.dispatchEvent(evt);		
+	}
 	
 	
 }(document.body.getElementsByClassName('list')[0]);
+
+
+const ee = new class {
+	constructor(elem) {
+		this.eventEmitter = elem;
+	}
+	
+	on(name, fn) {
+		this.eventEmitter.addEventListener(name, fn);
+	}
+	
+}(document.body);
+
+
+
+ee.on('delete', function(event) {
+	console.log(event.detail);
+});
