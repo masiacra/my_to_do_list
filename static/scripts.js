@@ -114,6 +114,29 @@ const xhr = new class {
 }('/list');
 
 
+const form = new class {
+	constructor(form) {
+		this.form = form;
+		this.form.onclick = this._onClick.bind(this);
+		this.form.onsubmit = function() {
+			return false;
+		};
+	}
+	
+	_onClick(event) {
+		const target = event.target;
+		if (!target.classList.contains('btn')) return;
+		const body = {
+			saske: 'sosi'
+		};
+		const evt = new CustomEvent('my_submit', {
+			bubbles: true,
+			detail: body
+		});
+		this.form.dispatchEvent(evt);
+	}
+}(document.forms[0]);
+
 
 
 ee.on('DOMContentLoaded', () => {
@@ -138,4 +161,8 @@ ee.on('delete', function(event) {
 		}
 		list.clearElement(id);
 	});
+});
+
+ee.on('my_submit', (event) => {
+	console.log(event.detail);
 });
