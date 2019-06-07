@@ -4,7 +4,7 @@ const list = new class {
 		this.elem.onclick = this._onClick.bind(this);
 	}
 	
-	render(err, data) {
+	render(data) {
 		//Вспомогательная функция для создания элементов "на лету"
 		function createElement({name, inner, classname}) {
 			let elem = document.createElement(name);
@@ -15,15 +15,7 @@ const list = new class {
 				elem.className = classname;
 			}
 			return elem;
-		}
-		
-		if (err) {
-			console.log(err);
-			this.reportAnError();
-			return;
-		}
-		
-		
+		}		
 		
 		data = typeof(data) === 'object' && data instanceof Array ?
 			data : null;
@@ -101,12 +93,17 @@ const xhr = new class {
 		};
 	}
 	
-	delete(body) {
+	delete(body, cb) {
 		const xml = new XMLHttpRequest();
 		xml.open('DELETE', this.url, true);	
 		body = JSON.stringify(body);	
+		xml.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 		xml.send(body);
 		xml.onload = function() {
+			if (xml.status !== 200) {
+				cb(new Error('Ошибка удаления. Статус ' + xml.status));
+				return;
+			}
 			cb(null);
 		};
 		xml.onerror = function() {
@@ -119,13 +116,20 @@ const xhr = new class {
 
 
 
-//ee.on('DOMContentLoaded', () => {
-	//xhr.get(list.render.bind(list));
-//});
+ee.on('DOMContentLoaded', () => {
+	xhr.get((err, data) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		list.render(data);
+	});
+});
 
 ee.on('delete', function(event) {
+	const id = event.detail;
 	const body = {
-		id: event.detail
+		id
 	};
 	xhr.delete(body, (err) => {
 		if (err) {

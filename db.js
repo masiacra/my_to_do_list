@@ -41,6 +41,8 @@ function addIntoDB(data) {
 	});
 }
 
+
+
 function deleteFromDB(id) {
 	connection.query(`DELETE FROM to_do_list WHERE id = ?`, id, 
 		(err, result) => {
