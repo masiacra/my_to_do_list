@@ -87,6 +87,10 @@ body {
 	outline: none;
 }
 
+.main__input_text:focus {
+	background-color: #FFFF00;
+}
+
 .main__btn {
 	font-size: 20px;
 	font-family: "Times New Roman", Times, serif;

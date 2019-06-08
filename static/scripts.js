@@ -97,7 +97,8 @@ const xhr = new class {
 		const xml = new XMLHttpRequest();
 		xml.open('DELETE', this.url, true);	
 		body = JSON.stringify(body);	
-		xml.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+		xml.setRequestHeader('Content-type', 
+			'application/json; charset=utf-8');
 		xml.send(body);
 		xml.onload = function() {
 			if (xml.status !== 200) {
@@ -108,6 +109,25 @@ const xhr = new class {
 		};
 		xml.onerror = function() {
 			cb(new Error('Ошибка удаления'));
+		};
+	}
+	
+	post(body, cb) {
+		const xml = new XMLHttpRequest();
+		xml.open('POST', this.url, true);	
+		body = JSON.stringify(body);	
+		xml.setRequestHeader('Content-type', 
+			'application/json; charset=utf-8');
+		xml.send(body);
+		xml.onload = function() {
+			if (xml.status !== 200) {
+				cb(new Error('Ошибка добавления дела. Статус ' + xml.status));
+				return;
+			}
+			cb(null);
+		};
+		xml.onerror = function() {
+			cb(new Error('Ошибка добавления'));
 		};
 	}
 	
@@ -203,5 +223,19 @@ ee.on('my_submit', (event) => {
 	const body = {
 		act: data
 	};
-	console.log(body);
+	xhr.post(body, (err) => {
+		if (err) {
+			console.log(err);
+			return;
+		}
+		xhr.get((err, data) => {
+			if (err) {
+				console.error(err);
+				return;
+			}
+			list.render(data);
+		});
+	});
 });
+
+
