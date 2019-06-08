@@ -121,20 +121,55 @@ const form = new class {
 		this.form.onsubmit = function() {
 			return false;
 		};
+		this.indicator = false;
 	}
 	
 	_onClick(event) {
 		const target = event.target;
 		if (!target.classList.contains('btn')) return;
-		const body = {
-			saske: 'sosi'
-		};
-		const evt = new CustomEvent('my_submit', {
-			bubbles: true,
-			detail: body
-		});
-		this.form.dispatchEvent(evt);
+		let fieldAct = this.form.act;
+		let data = fieldAct.value;
+		if (this.isValid(data)) {
+			if (this.indicator) {
+				this.turnOffAlarm();
+			}
+			fieldAct.value = '';
+			const evt = new CustomEvent('my_submit', {
+				bubbles: true,
+				detail: data
+			});
+			this.form.dispatchEvent(evt);
+		} else {
+			this.enableAlarm();
+		}
+
 	}
+	
+	enableAlarm() {
+		if (!this.indicator) {
+			this.indicator = true;
+			let warning = this.form.getElementsByClassName("warning")[0];
+			warning.classList.remove('hidden');
+			this.form.act.classList.add('attention');
+		}	
+	}
+	
+	turnOffAlarm() {
+		this.indicator = false;
+		let warning = this.form.getElementsByClassName("warning")[0];
+		warning.classList.add('hidden');
+		this.form.act.classList.remove('attention');
+	}
+	
+	isValid(data) {
+		if (!/\w/.test(data)) {
+			return false;
+		} else {
+			return !/[\[\]\{\}\\\/#%\^\*\|<>\+\=]/.test(data);
+		}
+	}
+	
+	
 }(document.forms[0]);
 
 
@@ -164,5 +199,9 @@ ee.on('delete', function(event) {
 });
 
 ee.on('my_submit', (event) => {
-	console.log(event.detail);
+	const data = event.detail;
+	const body = {
+		act: data
+	};
+	console.log(body);
 });
