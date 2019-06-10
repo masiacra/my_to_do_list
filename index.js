@@ -5,16 +5,19 @@
  */ 
 
 //Зависимости
-const db = require('./lib/db');
+//Стандартные модули
 const http = require('http');
-const PORT = process.env.PORT || 5000;
-const HOST = '127.0.0.1';
 const url = require('url');
+const StringDecoder = require('string_decoder').StringDecoder;
+//Собственные модули
 const getHandler = require('./lib/getHandler');
 const postHandler = require('./lib/postHandler');
 const deleteHandler = require('./lib/deleteHandler');
-const StringDecoder = require('string_decoder').StringDecoder;
+const helpers = require('./lib/helpers');
 
+//Глобальные переменные
+const PORT = process.env.PORT || 5000;
+const HOST = '127.0.0.1';
 const server = http.createServer(serve);
 
 
@@ -35,6 +38,31 @@ const router = {
 
 
 function serve(req, res) {
+	
+	//Получаем заголовок аутентификации
+	const authHeader = req.headers.authorization;
+	//Если пользователь не аутентифицирован, то возвращаем статус код 401
+	if (!authHeader) {
+		helpers.send401(res);
+		return;
+	}
+	
+	const auth = Buffer(authHeader.split(' ')[1], 'base64')
+		.toString()
+		.split(':');
+	
+	const user = auth[0];
+	const pass = auth[1];
+	
+	
+	//Если логин и пароль неправильные, то снова просим "представиться"
+	if (user !== 'foo1' || pass !== 'bar1') {
+		helpers.send401(res);
+		return;
+	} 
+
+
+	
 	
 	//Получаем url и парсим
 	const parsedUrl = url.parse(req.url, true);
